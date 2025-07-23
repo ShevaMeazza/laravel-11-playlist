@@ -1,7 +1,10 @@
 <?php
 
+use App\Models\Category;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Arr;
+use App\Models\Post;
+use App\Models\User;
 
 Route::get('/', function () {
     return view('home', ['title' => 'homepage']);
@@ -12,51 +15,22 @@ Route::get('/about', function () {
 });
 
 Route::get('/posts', function () {
-    return view('posts', 
-    ['title' => 'blog', 
-    'posts' => [
-
-    [
-        'id' => '1',
-        'slug' => 'bubur-ayam-diaduk',
-        'title' => 'Bubur ayam diaduk lebih sehat secara ilmiah',
-        'author' => 'Sheva Meazza',
-        'body' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti laboriosam reiciendis, quasi alias provident pariatur excepturi delectus, maxime, velit odio obcaecati sed natus harum quibusdam! Quo obcaecati fuga placeat nam?'
-    ],
-    [
-        'id' => '2',
-        'title' => 'Mengenal asal muasal Cireng',
-        'slug' => 'mengenal-asal-muasal-cireng',
-        'author' => 'Ocha Audyna',
-        'body' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti laboriosam reiciendis, quasi alias provident pariatur excepturi delectus, maxime, velit odio obcaecati sed natus harum quibusdam! Quo obcaecati fuga placeat nam?'
-    ]
-    ]
-]);
+    return view('posts', ['title' => 'blog', 'posts' => Post::all()]);
 });
 
-Route::get('/posts/{slug}', function ($slug) {
-    $posts = [
-        [
-        'id' => '1',
-        'slug' => 'bubur-ayam-diaduk',
-        'title' => 'Bubur ayam diaduk lebih sehat secara ilmiah',
-        'author' => 'Sheva Meazza',
-        'body' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti laboriosam reiciendis, quasi alias provident pariatur excepturi delectus, maxime, velit odio obcaecati sed natus harum quibusdam! Quo obcaecati fuga placeat nam?'
-    ],
-    [
-        'id' => '2',
-        'slug' => 'mengenal-asal-muasal-cireng',
-        'title' => 'Mengenal asal muasal Cireng',
-        'author' => 'Ocha Audyna',
-        'body' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti laboriosam reiciendis, quasi alias provident pariatur excepturi delectus, maxime, velit odio obcaecati sed natus harum quibusdam! Quo obcaecati fuga placeat nam?'
-    ]
-    ];
+Route::get('/posts/{post:slug}', function (Post $post) {
 
-    $post = Arr::first($posts, function($post) use ($slug) {
-         return $post['slug'] == $slug;
-    });
+    return view('post', ['title' => 'Single Post', 'post' => $post]);
+});
 
-    return view('post', ['title' => 'Single Post', 'posts' => $post]);
+Route::get('/authors/{user:username}', function (User $user) {
+
+    return view('posts', ['title' => count($user->posts) . ' Articles by ' . $user->name, 'posts' => $user->posts]);
+});
+
+Route::get('/categories/{category:slug}', function (Category $category) {
+
+    return view('posts', ['title' => 'Articles in : ' . $category->name, ' Articles by ' . $category->name, 'posts' => $category->posts]);
 });
 
 Route::get('/contact', function () {
